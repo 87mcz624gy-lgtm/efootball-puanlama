@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eFootball Puan Tablosu</title>
+<style>
+body{font-family:Arial;background:#10131a;color:white;text-align:center;padding:20px}
+h1{font-size:32px}
+#teams{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;max-width:700px;margin:auto}
+.card{background:#1c2230;padding:20px;border-radius:18px}
+.name{font-size:22px;font-weight:bold}
+.score{font-size:50px;margin:15px}
+input{padding:10px;border-radius:8px;border:0;margin:5px;width:80%}
+button{padding:10px 15px;border:0;border-radius:8px;margin:5px;font-weight:bold}
+.add{background:#35d477}
+.remove{background:#ff5964;color:white}
+@media(max-width:600px){#teams{grid-template-columns:1fr}}
+</style>
+</head>
+
+<body>
+
+<h1>🏆 eFootball Puan Tablosu</h1>
+
+<div id="teams"></div>
+
+<script>
+let teams = JSON.parse(localStorage.getItem("teams")) || [
+ {name:"Takım 1",score:0},
+ {name:"Takım 2",score:0},
+ {name:"Takım 3",score:0},
+ {name:"Takım 4",score:0}
+];
+
+function save(){
+ localStorage.setItem("teams",JSON.stringify(teams));
+}
+
+function show(){
+ document.getElementById("teams").innerHTML = teams.map((team,i)=>`
+ <div class="card">
+   <input class="name" value="${team.name}"
+    onchange="rename(${i},this.value)">
+
+   <div class="score">${team.score}</div>
+
+   <input id="point${i}" type="number"
+    min="1" value="1" placeholder="Puan miktarı">
+
+   <br>
+
+   <button class="add" onclick="change(${i},1)">
+    ➕ Puan Ekle
+   </button>
+
+   <button class="remove" onclick="change(${i},-1)">
+    ➖ Puan Çıkar
+   </button>
+ </div>
+ `).join("");
+}
+
+function change(i,multiplier){
+ let amount=Number(document.getElementById("point"+i).value);
+
+ if(amount>0){
+   teams[i].score += amount*multiplier;
+   if(teams[i].score<0) teams[i].score=0;
+   save();
+   show();
+ }
+}
+
+function rename(i,name){
+ teams[i].name=name || "Takım "+(i+1);
+ save();
+}
+
+show();
+</script>
+
+</body>
+</html>
